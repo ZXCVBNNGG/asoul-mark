@@ -1,7 +1,8 @@
 import regex
+from fastapi import Request
 
 from .exceptions import ParamTooLongError, ParamIsNoneError, UnCorrectUUIDError, UnCorrectUIDError, UnCorrectParamError, \
-    UnauthorizedError
+    UnauthorizedError, NotFoundError, NoPermissionError
 
 
 def param_length_verify(param, max_length):
@@ -32,8 +33,10 @@ def param_type_verify(param, type_):
         raise UnCorrectParamError
 
 
-def userUUID_get(UserUUID_C: str, UserUUID_H: str):
-    if not UserUUID_H or not UserUUID_C:
+def userUUID_get(request: Request):
+    UserUUID_H = request.headers.get("UserUUID")
+    UserUUID_C = request.cookies.get("UserUUID")
+    if not UserUUID_H or UserUUID_C:
         raise UnauthorizedError
     if UserUUID_C and UserUUID_H:
         return UserUUID_H
@@ -42,3 +45,13 @@ def userUUID_get(UserUUID_C: str, UserUUID_H: str):
             return UserUUID_C
         else:
             return UserUUID_H
+
+
+def mark_verify(mark):
+    if not mark:
+        raise NotFoundError
+
+
+def permission_verify(mark, userUUID):
+    if not mark[1] == userUUID:
+        raise NoPermissionError

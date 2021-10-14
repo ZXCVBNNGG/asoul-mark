@@ -130,4 +130,5 @@ dmypy.json
 
 # Private configs
 config.json
-test.http
+RequestTests/user.http
+/RequestTests/

@@ -1,12 +1,9 @@
-from typing import Optional
-
-from fastapi import APIRouter, Cookie, Header
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from ..databases import Marks
-from ..utils.exceptions import NoPermissionError, NotFoundError
 from ..utils.return_handler import return_handler
-from ..utils.verify import userUUID_get
+from ..utils.verify import userUUID_get, mark_verify, permission_verify
 
 router = APIRouter()
 
@@ -21,28 +18,16 @@ class MarkRemoveBody(BaseModel):
     markUUID: str
 
 
-def mark_verify(mark):
-    if not mark:
-        raise NotFoundError
-
-
-def permission_verify(mark, userUUID):
-    if not mark[1] == userUUID:
-        raise NoPermissionError
-
-
 @router.post("/mark/add")
-async def add(markAddBody: MarkAddBody, UserUUID_C: Optional[str] = Cookie(None),
-              UserUUID_H: Optional[str] = Header(None)):
-    userUUID = userUUID_get(UserUUID_C, UserUUID_H)
+async def add(markAddBody: MarkAddBody, request: Request):
+    userUUID = userUUID_get(request)
     Marks.add(userUUID, markAddBody.uid, markAddBody.reason, markAddBody.evidence)
     return return_handler()
 
 
 @router.post("/mark/remove")
-async def remove(markRemoveBody: MarkRemoveBody, UserUUID_C: Optional[str] = Cookie(None),
-                 UserUUID_H: Optional[str] = Header(None)):
-    userUUID = userUUID_get(UserUUID_C, UserUUID_H)
+async def remove(markRemoveBody: MarkRemoveBody, request: Request):
+    userUUID = userUUID_get(request)
     mark = Marks.get(markRemoveBody.markUUID)
     mark_verify(mark)
     permission_verify(mark, userUUID)
@@ -55,3 +40,19 @@ async def get(markUUID: str):
     mark = Marks.get(markUUID)
     mark_verify(mark)
     return return_handler({"markUUID": mark[0], "uid": mark[2], "reason": mark[3], "evidence": mark[4]})
+
+
+@router.get("/mark/get_all")
+async def get_all(request: Request):
+    userUUID = userUUID_get(request)
+    marks = Marks.get_all(userUUID)
+    mark_verify(marks)
+    return return_handler([{"markUUID": i[0], "uid": i[2], "reason": i[3], "evidence": i[4]} for i in marks])
+
+
+@router.get("/mark/get_by_uid")
+async def get_by_uid(uid: int, request: Request):
+    userUUID = userUUID_get(request)
+    marks = Marks.get_by_uid(userUUID, uid)
+    mark_verify(marks)
+    return return_handler([{"markUUID": i[0], "uid": i[2], "reason": i[3], "evidence": i[4]} for i in marks])
