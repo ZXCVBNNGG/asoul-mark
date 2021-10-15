@@ -2,8 +2,9 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from ..databases import Marks
+from ..databases.users import user_verify_by_uuid
 from ..utils.return_handler import return_handler
-from ..utils.verify import userUUID_get, mark_verify, permission_verify
+from ..utils.verify import userUUID_get, mark_verify, mark_permission_verify
 
 router = APIRouter()
 
@@ -21,6 +22,7 @@ class MarkRemoveBody(BaseModel):
 @router.post("/mark/add")
 async def add(markAddBody: MarkAddBody, request: Request):
     userUUID = userUUID_get(request)
+    user_verify_by_uuid(userUUID, True)
     Marks.add(userUUID, markAddBody.uid, markAddBody.reason, markAddBody.evidence)
     return return_handler()
 
@@ -28,9 +30,10 @@ async def add(markAddBody: MarkAddBody, request: Request):
 @router.post("/mark/remove")
 async def remove(markRemoveBody: MarkRemoveBody, request: Request):
     userUUID = userUUID_get(request)
+    user_verify_by_uuid(userUUID, True)
     mark = Marks.get(markRemoveBody.markUUID)
     mark_verify(mark)
-    permission_verify(mark, userUUID)
+    mark_permission_verify(mark, userUUID)
     Marks.remove(markRemoveBody.markUUID)
     return return_handler()
 
@@ -45,6 +48,7 @@ async def get(markUUID: str):
 @router.get("/mark/get_all")
 async def get_all(request: Request):
     userUUID = userUUID_get(request)
+    user_verify_by_uuid(userUUID, True)
     marks = Marks.get_all(userUUID)
     mark_verify(marks)
     return return_handler([{"markUUID": i[0], "uid": i[2], "reason": i[3], "evidence": i[4]} for i in marks])
@@ -53,6 +57,7 @@ async def get_all(request: Request):
 @router.get("/mark/get_by_uid")
 async def get_by_uid(uid: int, request: Request):
     userUUID = userUUID_get(request)
+    user_verify_by_uuid(userUUID, True)
     marks = Marks.get_by_uid(userUUID, uid)
     mark_verify(marks)
     return return_handler([{"markUUID": i[0], "uid": i[2], "reason": i[3], "evidence": i[4]} for i in marks])

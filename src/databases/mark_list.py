@@ -79,7 +79,8 @@ class MarkLists:
     @staticmethod
     def get_marks(markListUUID):
         uuid_verify(markListUUID)
-        result = db.execute(select(markLists).
+        result = db.execute(select(marks).
+                            join(markLists, marks.c.MarkUUID == markLists.c.MarkUUID).
                             where(markLists.c.MarkListUUID == markListUUID))
         return result.all()
 

@@ -52,6 +52,11 @@ def mark_verify(mark):
         raise NotFoundError
 
 
-def permission_verify(mark, userUUID):
+def mark_permission_verify(mark, userUUID):
     if not mark[1] == userUUID:
+        raise NoPermissionError
+
+
+def mark_list_permission_verify(markListInfo, userUUID):
+    if not markListInfo[1] == userUUID:
         raise NoPermissionError

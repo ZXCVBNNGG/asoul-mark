@@ -2,12 +2,14 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from src.apis import users, marks
+from src.apis import users, marks, mark_lists, subscribe
 from src.utils.exceptions import BaseError
 
 app = FastAPI()
 app.include_router(users.router)
 app.include_router(marks.router)
+app.include_router(mark_lists.router)
+app.include_router(subscribe.router)
 
 
 @app.exception_handler(BaseError)
