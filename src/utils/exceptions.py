@@ -67,3 +67,9 @@ class NoPermissionError(BaseError):
     def __init__(self):
         self.code = 403
         self.message = "无权执行此操作"
+
+
+class CannotBeSelfError:
+    def __init__(self):
+        self.code = 403
+        self.message = "不可添加自己的标记名单"
