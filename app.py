@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from src.apis import users, marks, mark_lists, subscribe
 from src.utils.exceptions import BaseError
 
-app = FastAPI()
+app = FastAPI(openapi_url="")
 app.include_router(users.router)
 app.include_router(marks.router)
 app.include_router(mark_lists.router)
