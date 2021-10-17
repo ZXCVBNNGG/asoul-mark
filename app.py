@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from src.apis import users, marks, mark_lists, subscribe
 from src.utils.exceptions import BaseError
+from src.utils.return_handler import return_handler
 
 app = FastAPI(openapi_url="")
 app.include_router(users.router)
@@ -18,6 +19,11 @@ async def exception_handler(request: Request, exc: BaseError):
         status_code=exc.code,
         content={"code": exc.code, "msg": exc.message},
     )
+
+
+@app.get("/")
+async def root():
+    return return_handler()
 
 
 if __name__ == "__main__":
