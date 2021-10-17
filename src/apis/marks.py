@@ -22,25 +22,25 @@ class MarkRemoveBody(BaseModel):
 @router.post("/mark/add")
 async def add(markAddBody: MarkAddBody, request: Request):
     userUUID = userUUID_get(request)
-    user_verify_by_uuid(userUUID, True)
-    Marks.add(userUUID, markAddBody.uid, markAddBody.reason, markAddBody.evidence)
+    await user_verify_by_uuid(userUUID, True)
+    await Marks.add(userUUID, markAddBody.uid, markAddBody.reason, markAddBody.evidence)
     return return_handler()
 
 
 @router.post("/mark/remove")
 async def remove(markRemoveBody: MarkRemoveBody, request: Request):
     userUUID = userUUID_get(request)
-    user_verify_by_uuid(userUUID, True)
-    mark = Marks.get(markRemoveBody.markUUID)
+    await user_verify_by_uuid(userUUID, True)
+    mark = await Marks.get(markRemoveBody.markUUID)
     mark_verify(mark)
     mark_permission_verify(mark, userUUID)
-    Marks.remove(markRemoveBody.markUUID)
+    await Marks.remove(markRemoveBody.markUUID)
     return return_handler()
 
 
 @router.get("/mark/get")
 async def get(markUUID: str):
-    mark = Marks.get(markUUID)
+    mark = await Marks.get(markUUID)
     mark_verify(mark)
     return return_handler({"markUUID": mark[0], "uid": mark[2], "reason": mark[3], "evidence": mark[4]})
 
@@ -48,8 +48,8 @@ async def get(markUUID: str):
 @router.get("/mark/get_all")
 async def get_all(request: Request):
     userUUID = userUUID_get(request)
-    user_verify_by_uuid(userUUID, True)
-    marks = Marks.get_all(userUUID)
+    await user_verify_by_uuid(userUUID, True)
+    marks = await Marks.get_all(userUUID)
     mark_verify(marks)
     return return_handler([{"markUUID": i[0], "uid": i[2], "reason": i[3], "evidence": i[4]} for i in marks])
 
@@ -57,7 +57,7 @@ async def get_all(request: Request):
 @router.get("/mark/get_by_uid")
 async def get_by_uid(uid: int, request: Request):
     userUUID = userUUID_get(request)
-    user_verify_by_uuid(userUUID, True)
-    marks = Marks.get_by_uid(userUUID, uid)
+    await user_verify_by_uuid(userUUID, True)
+    marks = await Marks.get_by_uid(userUUID, uid)
     mark_verify(marks)
     return return_handler([{"markUUID": i[0], "uid": i[2], "reason": i[3], "evidence": i[4]} for i in marks])

@@ -18,23 +18,23 @@ db = Database()
 
 class Subscriptions:
     @staticmethod
-    def add(userUUID, markListUUID):
+    async def add(userUUID, markListUUID):
         uuid_verify(userUUID)
         uuid_verify(markListUUID)
-        db.execute(insert(subscriptions).
-                   values(UserUUID=userUUID, MarkListUUID=markListUUID))
+        await db.execute(insert(subscriptions).
+                         values(UserUUID=userUUID, MarkListUUID=markListUUID))
 
     @staticmethod
-    def remove(userUUID, markListUUID):
+    async def remove(userUUID, markListUUID):
         uuid_verify(userUUID)
         uuid_verify(markListUUID)
-        db.execute(delete(subscriptions).
-                   where(subscriptions.c.UserUUID == userUUID).
-                   where(subscriptions.c.MarkListUUID == markListUUID))
+        await db.execute(delete(subscriptions).
+                         where(subscriptions.c.UserUUID == userUUID).
+                         where(subscriptions.c.MarkListUUID == markListUUID))
 
     @staticmethod
-    def get(userUUID):
+    async def get(userUUID):
         uuid_verify(userUUID)
-        result = db.execute(select(subscriptions).
-                            where(subscriptions.c.UserUUID == userUUID))
+        result = await db.execute(select(subscriptions).
+                                  where(subscriptions.c.UserUUID == userUUID))
         return result.all()

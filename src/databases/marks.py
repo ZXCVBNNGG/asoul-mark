@@ -23,41 +23,41 @@ db = Database()
 
 class Marks:
     @staticmethod
-    def add(userUUID, uid, reason, evidence=""):
+    async def add(userUUID, uid, reason, evidence=""):
         uuid_verify(userUUID)
         uid_verify(uid)
         param_length_verify(reason, 65535)
         if evidence:
             param_length_verify(evidence, 4294967295)
-        db.execute(insert(marks).
-                   values(MarkUUID=generate_uuid(), UserUUID=userUUID, MarkUid=uid, MarkReason=reason,
-                          MarkEvidence=evidence))
+        await db.execute(insert(marks).
+                         values(MarkUUID=generate_uuid(), UserUUID=userUUID, MarkUid=uid, MarkReason=reason,
+                                MarkEvidence=evidence))
 
     @staticmethod
-    def remove(markUUID):
+    async def remove(markUUID):
         uuid_verify(markUUID)
-        db.execute(delete(marks).
-                   where(marks.c.MarkUUID == markUUID))
+        await db.execute(delete(marks).
+                         where(marks.c.MarkUUID == markUUID))
 
     @staticmethod
-    def get(markUUID):
+    async def get(markUUID):
         uuid_verify(markUUID)
-        result: CursorResult = db.execute(select(marks).
-                                          where(marks.c.MarkUUID == markUUID))
+        result: CursorResult = await db.execute(select(marks).
+                                                where(marks.c.MarkUUID == markUUID))
         return result.one()
 
     @staticmethod
-    def get_all(userUUID):
+    async def get_all(userUUID):
         uuid_verify(userUUID)
-        result: CursorResult = db.execute(select(marks).
-                                          where(marks.c.UserUUID == userUUID))
+        result: CursorResult = await db.execute(select(marks).
+                                                where(marks.c.UserUUID == userUUID))
         return result.all()
 
     @staticmethod
-    def get_by_uid(userUUID, uid):
+    async def get_by_uid(userUUID, uid):
         uuid_verify(userUUID)
         uid_verify(uid)
-        result: CursorResult = db.execute(select(marks).
-                                          where(marks.c.UserUUID == userUUID).
-                                          where(marks.c.MarkUid == uid))
+        result: CursorResult = await db.execute(select(marks).
+                                                where(marks.c.UserUUID == userUUID).
+                                                where(marks.c.MarkUid == uid))
         return result.all()

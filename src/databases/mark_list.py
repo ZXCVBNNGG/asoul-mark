@@ -31,65 +31,65 @@ db = Database()
 
 class MarkLists:
     @staticmethod
-    def create(userUUID: str, title: str, shared: bool, description: str = None):
+    async def create(userUUID: str, title: str, shared: bool, description: str = None):
         uuid_verify(userUUID)
         param_length_verify(title, 128)
         param_type_verify(shared, bool)
         if description:
             param_length_verify(description, 65535)
-        db.execute(insert(markListInfo).
-                   values(MarkListUUID=generate_uuid(), UserUUID=userUUID, Title=title, Description=description,
-                          Shared=shared))
+        await db.execute(insert(markListInfo).
+                         values(MarkListUUID=generate_uuid(), UserUUID=userUUID, Title=title, Description=description,
+                                Shared=shared))
 
     @staticmethod
-    def add_mark(markListUUID: str, markUUID: str):
+    async def add_mark(markListUUID: str, markUUID: str):
         uuid_verify(markListUUID)
         uuid_verify(markUUID)
-        db.execute(insert(markLists).
-                   values(MarkListUUID=markListUUID, MarkUUID=markUUID))
+        await db.execute(insert(markLists).
+                         values(MarkListUUID=markListUUID, MarkUUID=markUUID))
 
     @staticmethod
-    def remove_mark(markListUUID: str, markUUID: str):
+    async def remove_mark(markListUUID: str, markUUID: str):
         uuid_verify(markListUUID)
         uuid_verify(markUUID)
-        db.execute(delete(markLists).
-                   where(markLists.c.MarkListUUID == markListUUID).
-                   where(markLists.c.MarkUUID == markUUID))
+        await db.execute(delete(markLists).
+                         where(markLists.c.MarkListUUID == markListUUID).
+                         where(markLists.c.MarkUUID == markUUID))
 
     @staticmethod
-    def info(markListUUID: str):
+    async def info(markListUUID: str):
         uuid_verify(markListUUID)
-        result: CursorResult = db.execute(select(markListInfo).
-                                          where(markListInfo.c.MarkListUUID == markListUUID))
+        result: CursorResult = await db.execute(select(markListInfo).
+                                                where(markListInfo.c.MarkListUUID == markListUUID))
         return result.one()
 
     @staticmethod
-    def remove(markListUUID):
+    async def remove(markListUUID):
         uuid_verify(markListUUID)
-        db.execute(delete(markListInfo).
-                   where(markListInfo.c.MarkListUUID == markListUUID))
+        await db.execute(delete(markListInfo).
+                         where(markListInfo.c.MarkListUUID == markListUUID))
 
     @staticmethod
-    def get_mark_lists(userUUID):
+    async def get_mark_lists(userUUID):
         uuid_verify(userUUID)
-        result = db.execute(select(markListInfo).
-                            where(markListInfo.c.UserUUID == userUUID))
+        result = await db.execute(select(markListInfo).
+                                  where(markListInfo.c.UserUUID == userUUID))
         return result.all()
 
     @staticmethod
-    def get_marks(markListUUID):
+    async def get_marks(markListUUID):
         uuid_verify(markListUUID)
-        result = db.execute(select(marks).
-                            join(markLists, marks.c.MarkUUID == markLists.c.MarkUUID).
-                            where(markLists.c.MarkListUUID == markListUUID))
+        result = await db.execute(select(marks).
+                                  join(markLists, marks.c.MarkUUID == markLists.c.MarkUUID).
+                                  where(markLists.c.MarkListUUID == markListUUID))
         return result.all()
 
     @staticmethod
-    def get_by_uid(markListUUID, markUid):
+    async def get_by_uid(markListUUID, markUid):
         uuid_verify(markListUUID)
         uid_verify(markUid)
-        result = db.execute(select(marks).
-                            join(markLists, marks.c.MarkUUID == markLists.c.MarkUUID).
-                            where(marks.c.MarkUid == markUid).
-                            where(markLists.c.MarkListUUID == markListUUID))
+        result = await db.execute(select(marks).
+                                  join(markLists, marks.c.MarkUUID == markLists.c.MarkUUID).
+                                  where(marks.c.MarkUid == markUid).
+                                  where(markLists.c.MarkListUUID == markListUUID))
         return result.all()
