@@ -29,11 +29,6 @@ class MarkListRemoveMarkBody(BaseModel):
     markUUID: str
 
 
-class MarkListGetByUidBody(BaseModel):
-    markListUUID: str
-    uid: int
-
-
 @router.post("/mark_list/create")
 async def mark_list_create(markListBody: MarkListCreateBody, request: Request):
     userUUID = userUUID_get(request)
@@ -99,11 +94,11 @@ async def mark_list_remove_mark(markBody: MarkListRemoveMarkBody, request: Reque
 
 
 @router.get("/mark_list/get_marks_by_uid")
-async def mark_list_get_marks_by_uid(markBody: MarkListGetByUidBody, request: Request):
+async def mark_list_get_marks_by_uid(markListUUID: str, uid: int, request: Request):
     userUUID = userUUID_get(request)
     await user_verify_by_uuid(userUUID, True)
-    info = await MarkLists.info(markBody.markListUUID)
+    info = await MarkLists.info(markListUUID)
     if not info[4]:
         mark_list_permission_verify(info, userUUID)
-    marks = await MarkLists.get_by_uid(markBody.markListUUID, markBody.uid)
+    marks = await MarkLists.get_by_uid(markListUUID, uid)
     return return_handler([{"markUUID": i[0], "uid": i[2], "reason": i[3], "evidence": i[4]} for i in marks])
