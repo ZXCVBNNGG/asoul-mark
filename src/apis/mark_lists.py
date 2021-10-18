@@ -29,6 +29,11 @@ class MarkListRemoveMarkBody(BaseModel):
     markUUID: str
 
 
+class MarkListGetByUidBody(BaseModel):
+    markListUUID: str
+    uid: int
+
+
 @router.post("/mark_list/create")
 async def mark_list_create(markListBody: MarkListCreateBody, request: Request):
     userUUID = userUUID_get(request)

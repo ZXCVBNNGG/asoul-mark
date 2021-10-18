@@ -68,6 +68,8 @@ class MarkLists:
         uuid_verify(markListUUID)
         await db.execute(delete(markListInfo).
                          where(markListInfo.c.MarkListUUID == markListUUID))
+        await db.execute(delete(markLists).
+                         where(markLists.c.MarkListUUID == markListUUID))
 
     @staticmethod
     async def get_mark_lists(userUUID):
