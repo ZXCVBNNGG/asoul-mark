@@ -26,7 +26,7 @@ async def exception_handler(request: Request, exc: BaseError):
 async def validation_exception_handler(request, exc):
     return JSONResponse(
         status_code=412,
-        content={"code": 412, "msg": "缺少参数或参数不合法"},
+        content={"code": 412, "msg": str(exc)}
     )
 
 
